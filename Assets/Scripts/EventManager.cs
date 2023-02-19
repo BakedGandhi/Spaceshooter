@@ -16,12 +16,45 @@ public class EventManager : MonoBehaviour
     public delegate void UpdateTime();
     public static event UpdateTime RefreshTime;
 
+    public delegate void UpdateHighscores();
+    public static event UpdateHighscores RefreshHighScores;
+
+    public delegate void StopGameScene();
+    public static event StopGameScene StopGame;
+
+    public delegate void StartGameScene();
+    public static event StartGameScene StartGame;
+
     private void Awake()
     {
         if (!instance)
             instance = this;
         else
             Destroy(this.gameObject);
+    }
+
+    public void OnUpdateHighScores()
+    {
+        if (RefreshHighScores != null)
+        {
+            RefreshHighScores();
+        }
+    }
+
+    public void OnStopGameScene()
+    {
+        if (StopGame != null)
+        {
+            StopGame();
+        }
+    }
+
+    public void OnStartGameScene()
+    {
+        if (StartGame != null)
+        {
+            StartGame();
+        }
     }
 
     public void OnUpdateHealth()

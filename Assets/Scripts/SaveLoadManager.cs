@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
 
 public class SaveLoadManager : MonoBehaviour
 {
     private static SaveLoadManager instance;
     public static SaveLoadManager Instance => instance;
-    private const string fileName = "Highscores.score";
+    private const string FILENAME = "Highscores.score";
     private static Save save;
-    private string savePath = Path.Combine(Application.streamingAssetsPath, fileName);
+    private string savePath = Path.Combine(Application.streamingAssetsPath, FILENAME);
     public Save GetSave => save;
 
+    private void OnEnable()
+    {
+        EventManager.RefreshHighScores += LoadScore; 
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RefreshHighScores -= LoadScore;
+    }
     private void Awake()
     {
         if (!instance)
@@ -23,25 +33,22 @@ public class SaveLoadManager : MonoBehaviour
             LoadScore();
     }
 
-    public void SaveScore(string _name,int _score)
+    public void SaveScore(ScoreAndName _scoreAndName)
     {
-        using (FileStream stream = new FileStream(Path.Combine(Application.streamingAssetsPath, fileName), FileMode.Create))
+        using (FileStream stream = new FileStream(Path.Combine(Application.streamingAssetsPath, FILENAME), FileMode.Create))
         {
             BinaryFormatter formatter = new BinaryFormatter();
             try
             {
                 if (save == null)
                 {
-                    Dictionary<string,int> scores = new Dictionary<string, int>();
-                    scores.Add(_name,_score);
-                    save = new Save(scores);
+                    save = new Save(_scoreAndName);
                 }
                 else
                 {
-                    save.HighScores.Add(_name,_score);
+                    save.HighScores.Add(_scoreAndName);
                 }
                 formatter.Serialize(stream, save);
-
             }
             catch (System.Exception e)
             {
@@ -73,4 +80,10 @@ public class SaveLoadManager : MonoBehaviour
             Debug.LogError("Save file does not exist in the current path");
         }
     }
+
+    public IEnumerable<ScoreAndName> OrderSavedHighScores()
+    {
+        return save.HighScores.OrderByDescending(x => x.Score);
+    }
+
 }

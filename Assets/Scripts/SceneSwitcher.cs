@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,9 +11,21 @@ public class SceneSwitcher : MonoBehaviour
         Game,
         Score
     }
+
     private static SceneSwitcher instance;
     public static SceneSwitcher Instance => instance;
     private void OnEnable()
+    {
+        EventManager.StartGame += LoadGameScene;
+        EventManager.StopGame += LoadScoreScene;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.StartGame -= LoadGameScene;
+        EventManager.StopGame -= LoadScoreScene;
+    }
+    private void Awake()
     {
         if (!instance)
             instance = this;
@@ -20,20 +33,24 @@ public class SceneSwitcher : MonoBehaviour
             Destroy(gameObject);
     }
 
-    public void LoadScene(EScene _eScene)
+    private void LoadGameScene()
     {
-        switch (_eScene)
+        if (SceneManager.GetActiveScene().name != "GameScene")
         {
-            case EScene.Game:
-                GameManager.Instance.Score = 0;
-                SceneManager.LoadScene("GameScene");
-                break;
-            case EScene.Score:
-                SceneManager.LoadScene("ScoreScene");
-                break;
-            default:
-                break;
+            SceneManager.LoadScene("GameScene");
+        }
+        else
+        {
+            Debug.Log("I am already in Game Scene");
         }
     }
 
+    private void LoadScoreScene()
+    {
+        if (SceneManager.GetActiveScene().name != "ScoreScene")
+        {
+            SceneManager.LoadScene("ScoreScene");
+        }
+
+    }
 }

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI : MonoBehaviour
+public class GameUI : MonoBehaviour
 {
     [SerializeField] private PlayerController playerController;
     [SerializeField] private TMP_Text scoreText;

@@ -22,7 +22,14 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         isAlive = true;
+        EventManager.Instance.OnStartGameScene();
         StartCoroutine(ShootingCoroutine());
+    }
+
+    private void Start()
+    {
+        currentProjectile = Eprojectiles.standart;
+        GameManager.Instance.StartGame();
     }
     private void OnMouseDrag()
     {
@@ -38,19 +45,17 @@ public class PlayerController : MonoBehaviour
             if (playerHealth < 0)
             {
                 isAlive = false;
-                GameManager.Instance.IsRunning = false;
-                SceneSwitcher.Instance.LoadScene(SceneSwitcher.EScene.Score);
+                EventManager.Instance.OnStopGameScene();
             }
             else
             {
                 EventManager.Instance.OnUpdateHealth();
             }
         }
-        else
+        else if (collision.gameObject.layer == 8)
         {
             currentProjectile = Eprojectiles.powered;
         }
-
     }
 
     IEnumerator ShootingCoroutine()

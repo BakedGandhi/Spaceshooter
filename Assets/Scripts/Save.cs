@@ -5,9 +5,9 @@ using UnityEngine;
 [System.Serializable]
 public class Save
 {
-    public Dictionary<string,int> HighScores = new Dictionary<string,int>();
-    public Save(Dictionary<string,int> _scores)
+    public List<ScoreAndName> HighScores = new List<ScoreAndName>();
+    public Save(ScoreAndName _scoreAndName)
     {
-        HighScores = _scores;
+        HighScores.Add(_scoreAndName);
     }
 }

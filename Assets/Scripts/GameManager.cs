@@ -11,37 +11,54 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject[] enemies;
     [SerializeField] private GameObject[] enemySpawnPoints;
+    [SerializeField] private GameObject[] powerUps;
     [SerializeField] private float spawnDelay;
     [SerializeField] private int time;
-    private Dictionary<string,int> highScores;
+    [SerializeField] private float timeForPowerUp;
     public int Score;
-    public bool IsRunning;
+    private bool isRunning;
     public int GetTime => time;
+    private void OnEnable()
+    {
+        EventManager.StopGame += StopGameScene;
+        //EventManager.StartGame += StartGame;
+    }
 
+    private void OnDisable()
+    {
+        EventManager.StopGame -= StopGameScene;
+        //EventManager.StartGame -= StartGame;
+    }
 
     private void Awake()
     {
-        if (!instance)
-            instance = this;
-        else
+        if (instance != null && instance != this)
             Destroy(gameObject);
-        try
-        {
-            highScores = SaveLoadManager.Instance.GetSave.HighScores;
-        }
-        catch (System.Exception e)
-        {
-            Debug.Log("Highscores could not be loaded by Gamemanger " + e);
-        }
-        IsRunning = true;
-        time = 0;
-        StartCoroutine(SpawnEnemyCoroutine());
-        StartCoroutine(TimeTrackCoroutine());
+        else
+            instance = this;
+        DontDestroyOnLoad(this);
     }
 
+    private void StopGameScene()
+    {
+        isRunning = false;
+        StopCoroutine(SpawnEnemyCoroutine());
+        StopCoroutine(TimeTrackCoroutine());
+        StopCoroutine(SpawnPowerUpCoroutine());
+    }
+
+    public void StartGame()
+    {
+        Score = 0;
+        time = 0;
+        isRunning = true;
+        StartCoroutine(SpawnEnemyCoroutine());
+        StartCoroutine(TimeTrackCoroutine());
+        StartCoroutine(SpawnPowerUpCoroutine());
+    }
     IEnumerator TimeTrackCoroutine()
     {
-        while (IsRunning)
+        while (isRunning)
         {
             Score = Score +1;
             time = time +1;
@@ -51,18 +68,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnPowerUpCoroutine()
+    {
+        while (isRunning)
+        {
+            yield return new WaitForSeconds(timeForPowerUp);
+            int randomPowerUp = Random.Range(0, powerUps.Length);
+            GameObject tempPowerUp = powerUps[randomPowerUp];
+            Instantiate(tempPowerUp);
+            timeForPowerUp = timeForPowerUp + timeForPowerUp; 
+        }
+    }
 
     IEnumerator SpawnEnemyCoroutine()
     {
-        while (IsRunning)
+        while (isRunning)
         {
             int randomSpawnPoint = Random.Range(0, enemySpawnPoints.Length);
             int randomEnemy = Random.Range(0, enemies.Length);
             GameObject tempEnemy = enemies[randomEnemy];
             tempEnemy.transform.position = enemySpawnPoints[randomSpawnPoint].transform.position;
             Instantiate(tempEnemy);
-            Debug.Log(enemySpawnPoints[randomSpawnPoint]);
             yield return new WaitForSeconds(spawnDelay);
         }
     }
+
 }
