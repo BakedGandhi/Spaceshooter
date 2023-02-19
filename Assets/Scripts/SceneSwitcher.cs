@@ -25,6 +25,7 @@ public class SceneSwitcher : MonoBehaviour
         switch (_eScene)
         {
             case EScene.Game:
+                GameManager.Instance.Score = 0;
                 SceneManager.LoadScene("GameScene");
                 break;
             case EScene.Score:

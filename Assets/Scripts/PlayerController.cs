@@ -12,10 +12,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject[] projectiles;
     [SerializeField] private GameObject projectileParent;
     [SerializeField, Tooltip("The time between each shoot that is fired in seconds")] private float fireRate;
-    private bool isAlive;
-    private Eprojectiles currentProjectile;
     [SerializeField] private int playerHealth = 3;
     [SerializeField] private float bulletUpgradeOffset;
+    private bool isAlive;
+    private Eprojectiles currentProjectile;
+
+    public int GetPlayerHealth => playerHealth;
 
     private void Awake()
     {
@@ -30,15 +32,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (playerHealth < 0)
+        if (collision.gameObject.layer == 7)
         {
-            isAlive = false;
-            GameManager.Instance.IsRunning = false;
-            SaveLoadManager.Instance.SaveScore(GameManager.Instance.Score);
-            SceneSwitcher.Instance.LoadScene(SceneSwitcher.EScene.Score);
+            playerHealth--;
+            if (playerHealth < 0)
+            {
+                isAlive = false;
+                GameManager.Instance.IsRunning = false;
+                SceneSwitcher.Instance.LoadScene(SceneSwitcher.EScene.Score);
+            }
+            else
+            {
+                EventManager.Instance.OnUpdateHealth();
+            }
         }
         else
-            playerHealth--;
+        {
+            currentProjectile = Eprojectiles.powered;
+        }
+
     }
 
     IEnumerator ShootingCoroutine()

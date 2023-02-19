@@ -12,21 +12,18 @@ public class SaveLoadManager : MonoBehaviour
     private static Save save;
     private string savePath = Path.Combine(Application.streamingAssetsPath, fileName);
     public Save GetSave => save;
-    private void OnEnable()
+
+    private void Awake()
     {
         if (!instance)
             instance = this;
         else
             Destroy(gameObject);
-    }
-
-    private void Awake()
-    {
         if (File.Exists(savePath))
             LoadScore();
     }
 
-    public void SaveScore(int score)
+    public void SaveScore(string _name,int _score)
     {
         using (FileStream stream = new FileStream(Path.Combine(Application.streamingAssetsPath, fileName), FileMode.Create))
         {
@@ -35,13 +32,13 @@ public class SaveLoadManager : MonoBehaviour
             {
                 if (save == null)
                 {
-                    List<int> scores = new List<int>();
-                    scores.Add(score);
+                    Dictionary<string,int> scores = new Dictionary<string, int>();
+                    scores.Add(_name,_score);
                     save = new Save(scores);
                 }
                 else
                 {
-                    save.HighScores.Add(score);
+                    save.HighScores.Add(_name,_score);
                 }
                 formatter.Serialize(stream, save);
 

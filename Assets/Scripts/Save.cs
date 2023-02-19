@@ -5,8 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class Save
 {
-    public List<int> HighScores = new List<int>();
-    public Save(List<int> _scores)
+    public Dictionary<string,int> HighScores = new Dictionary<string,int>();
+    public Save(Dictionary<string,int> _scores)
     {
         HighScores = _scores;
     }
