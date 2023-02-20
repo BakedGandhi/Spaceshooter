@@ -27,10 +27,10 @@ public class EventManager : MonoBehaviour
 
     private void Awake()
     {
-        if (!instance)
-            instance = this;
-        else
+        if (instance != null && instance != this)
             Destroy(this.gameObject);
+        else
+            instance = this;
     }
 
     public void OnUpdateHighScores()

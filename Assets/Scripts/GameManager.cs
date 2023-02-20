@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 /// <summary>
 /// Manages enemy spawning, time and score
 /// </summary>
@@ -21,24 +22,27 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         EventManager.StopGame += StopGameScene;
-        //EventManager.StartGame += StartGame;
     }
 
     private void OnDisable()
     {
         EventManager.StopGame -= StopGameScene;
-        //EventManager.StartGame -= StartGame;
     }
 
     private void Awake()
     {
         if (instance != null && instance != this)
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         else
             instance = this;
         DontDestroyOnLoad(this);
     }
 
+    private void OnLevelWasLoaded(int level)
+    {
+        enemySpawnPoints = GameObject.FindGameObjectsWithTag("EnemySpawnPoint");
+
+    }
     private void StopGameScene()
     {
         isRunning = false;
@@ -60,8 +64,8 @@ public class GameManager : MonoBehaviour
     {
         while (isRunning)
         {
-            Score = Score +1;
-            time = time +1;
+            Score = Score + 1;
+            time = time + 1;
             EventManager.Instance.OnUpdateScore();
             EventManager.Instance.OnUpdateTime();
             yield return new WaitForSeconds(1);
@@ -73,10 +77,14 @@ public class GameManager : MonoBehaviour
         while (isRunning)
         {
             yield return new WaitForSeconds(timeForPowerUp);
-            int randomPowerUp = Random.Range(0, powerUps.Length);
-            GameObject tempPowerUp = powerUps[randomPowerUp];
-            Instantiate(tempPowerUp);
-            timeForPowerUp = timeForPowerUp + timeForPowerUp; 
+            if (isRunning)
+            {
+                int randomPowerUp = Random.Range(0, powerUps.Length);
+                GameObject tempPowerUp = powerUps[randomPowerUp];
+                Instantiate(tempPowerUp);
+                timeForPowerUp = timeForPowerUp + timeForPowerUp;
+
+            }
         }
     }
 
@@ -84,12 +92,15 @@ public class GameManager : MonoBehaviour
     {
         while (isRunning)
         {
-            int randomSpawnPoint = Random.Range(0, enemySpawnPoints.Length);
-            int randomEnemy = Random.Range(0, enemies.Length);
-            GameObject tempEnemy = enemies[randomEnemy];
-            tempEnemy.transform.position = enemySpawnPoints[randomSpawnPoint].transform.position;
-            Instantiate(tempEnemy);
             yield return new WaitForSeconds(spawnDelay);
+            if (isRunning)
+            {
+                int randomSpawnPoint = Random.Range(0, enemySpawnPoints.Length);
+                int randomEnemy = Random.Range(0, enemies.Length);
+                GameObject tempEnemy = enemies[randomEnemy];
+                tempEnemy.transform.position = enemySpawnPoints[randomSpawnPoint].transform.position;
+                Instantiate(tempEnemy);
+            }
         }
     }
 

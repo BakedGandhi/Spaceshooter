@@ -11,7 +11,6 @@ public class SaveLoadManager : MonoBehaviour
     public static SaveLoadManager Instance => instance;
     private const string FILENAME = "Highscores.score";
     private static Save save;
-    private string savePath = Path.Combine(Application.streamingAssetsPath, FILENAME);
     public Save GetSave => save;
 
     private void OnEnable()
@@ -25,17 +24,16 @@ public class SaveLoadManager : MonoBehaviour
     }
     private void Awake()
     {
-        if (!instance)
-            instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
         else
-            Destroy(gameObject);
-        if (File.Exists(savePath))
-            LoadScore();
+            instance= this;
+        DontDestroyOnLoad(this);
     }
 
     public void SaveScore(ScoreAndName _scoreAndName)
     {
-        using (FileStream stream = new FileStream(Path.Combine(Application.streamingAssetsPath, FILENAME), FileMode.Create))
+        using (FileStream stream = new FileStream(Path.Combine(Application.dataPath, FILENAME), FileMode.Create))
         {
             BinaryFormatter formatter = new BinaryFormatter();
             try
@@ -60,6 +58,7 @@ public class SaveLoadManager : MonoBehaviour
 
     public void LoadScore()
     {
+        string savePath = Path.Combine(Application.dataPath, FILENAME);
         if (File.Exists(savePath))
         {
             using (FileStream stream = new FileStream(savePath, FileMode.Open))

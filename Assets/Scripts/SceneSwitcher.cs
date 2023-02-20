@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,10 +26,11 @@ public class SceneSwitcher : MonoBehaviour
     }
     private void Awake()
     {
-        if (!instance)
-            instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
         else
-            Destroy(gameObject);
+            instance = this;
+        DontDestroyOnLoad(this);
     }
 
     private void LoadGameScene()

@@ -22,8 +22,12 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         isAlive = true;
-        EventManager.Instance.OnStartGameScene();
         StartCoroutine(ShootingCoroutine());
+    }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        EventManager.Instance.OnStartGameScene();
     }
 
     private void Start()

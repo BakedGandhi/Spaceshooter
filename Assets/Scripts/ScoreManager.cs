@@ -8,7 +8,7 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     public void CreateHighScore()
     {
-        ScoreAndName scoreAndName = new ScoreAndName(nameText.ToString(), GameManager.Instance.Score);
+        ScoreAndName scoreAndName = new ScoreAndName(nameText.text.ToString(), GameManager.Instance.Score);
         SaveLoadManager.Instance.SaveScore(scoreAndName);
         EventManager.Instance.OnUpdateHighScores();
     }
